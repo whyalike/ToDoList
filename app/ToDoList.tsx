@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, FlatList, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import TodoItem from "./Todo";
 import { todoContext, Todo } from "./realm";
 
@@ -21,18 +21,18 @@ export const TodoList = () => {
     const todos = useQuery(Todo);
     console.log("Found todos: ", todos);
 
-    const renderItem = ({item}: {item: Todo}) => {
-        return (
-            <Text>{item.description}</Text>
-        )
-    }
-
     return (
-        <SafeAreaView>
-            {todos.map((todo) => {
-                return <TodoItem item={todo}></TodoItem>
-            })}
-        </SafeAreaView>
+        <View style={{flexGrow: 1, padding: 30}}>
+            <ScrollView>
+                    {todos.map((todo) => {
+                        return (
+                            <View style={{backgroundColor: 'orange', marginBottom: 10}}>
+                                <TodoItem item={todo}></TodoItem>
+                            </View>
+                        )
+                    })}
+            </ScrollView>
+        </View>
     )
     
 }
