@@ -1,9 +1,9 @@
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import React, { useCallback } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import TodoItem from "./Todo";
 import { todoContext, Todo } from "./realm";
 
-const {useQuery} = todoContext;
+const {useQuery, useRealm} = todoContext;
 
 type ItemData = {
     id: string;
@@ -19,14 +19,36 @@ const DATA: ItemData[] = [
 
 export const TodoList = () => {
     const todos = useQuery(Todo);
+    const realm = useRealm();
+
+    const [newTodoText, setNewTodoText] = React.useState('');
+
+    const addTodo = useCallback(() => {
+        realm.write(() => {
+            realm.create(Todo.schema.name, {
+                _id: new Realm.BSON.ObjectId(),
+                description: newTodoText, 
+                completed: false,
+                createdAt: new Date()
+            });
+        })
+    }, [realm])
     console.log("Found todos: ", todos);
 
     return (
         <View style={{flexGrow: 1, padding: 30}}>
+            <View style={{flexDirection: 'row'}}>
+                <TextInput value={newTodoText}
+                    onChangeText={(text) => setNewTodoText(text)}
+                    style={{fontSize: 24, padding: 12, borderColor: "gray", borderWidth: 1, backgroundColor:'#EEEEE', flexGrow:1}} placeholder="Add a todo" />
+                <Pressable onPress={() => addTodo(newTodoText)}>
+                    <Text style={{fontSize: 24, padding: 12}}>Add</Text>
+                </Pressable>
+            </View>
             <ScrollView>
                     {todos.map((todo) => {
                         return (
-                            <View style={{backgroundColor: 'orange', marginBottom: 10}}>
+                            <View>
                                 <TodoItem item={todo}></TodoItem>
                             </View>
                         )
